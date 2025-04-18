@@ -2046,6 +2046,7 @@
         if (l) {
           setLngProps(l);
           this.translator.changeLanguage(l);
+          this.t = this.getFixedT(null, this.options.defaultNS);
           this.isLanguageChangingTo = undefined;
           this.emit('languageChanged', l);
           this.logger.log('languageChanged', l);
