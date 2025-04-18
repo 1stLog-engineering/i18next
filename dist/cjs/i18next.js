@@ -2042,7 +2042,11 @@ class I18n extends EventEmitter {
       if (l) {
         setLngProps(l);
         this.translator.changeLanguage(l);
-        this.t = this.getFixedT(null, this.options.defaultNS);
+        console.log('[i18next patch] Rebinding t after language change');
+        const fixedT = this.getFixedT(null, this.options.defaultNS);
+        this.t = function () {
+          return fixedT(...arguments);
+        };
         this.isLanguageChangingTo = undefined;
         this.emit('languageChanged', l);
         this.logger.log('languageChanged', l);
