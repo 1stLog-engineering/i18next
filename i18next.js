@@ -2047,10 +2047,7 @@
           setLngProps(l);
           this.translator.changeLanguage(l);
           console.log('[i18next patch] Rebinding t after language change');
-          const fixedT = this.getFixedT(null, this.options.defaultNS);
-          this.t = function () {
-            return fixedT(...arguments);
-          };
+          this.t = this.translator.translate.bind(this.translator);
           this.isLanguageChangingTo = undefined;
           this.emit('languageChanged', l);
           this.logger.log('languageChanged', l);
