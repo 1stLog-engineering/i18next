@@ -324,24 +324,29 @@ class I18n extends EventEmitter {
       this.setResolvedLanguage(l);
     };
 
+    const reboundT = (...args) => this.translator.translate(...args);
+
     const done = (err, l) => {
       if (l) {
         setLngProps(l);
         this.translator.changeLanguage(l);
     
-        console.log('[i18next patch] Rebinding t after language change')
-        this.t = this.translator.translate.bind(this.translator);
+        console.log('[i18next patch] Rebinding t after language change', {
+          translatorLanguage: this.translator.language,
+          callBack: callback?.toString() ?? 'no callback',
+        });
     
-        this.isLanguageChangingTo = undefined;
+        this.t = reboundT;
+    
         this.emit('languageChanged', l);
         this.logger.log('languageChanged', l);
-      } else {
-        this.isLanguageChangingTo = undefined;
       }
-
-      deferred.resolve((...args) => this.t(...args));
-      if (callback) callback(err, (...args) => this.t(...args));
+    
+      this.isLanguageChangingTo = undefined;
+      deferred.resolve(reboundT);
+      if (callback) callback(err, reboundT);
     };
+    
 
     const setLng = lngs => {
       // if detected lng is falsy, set it to empty array, to make sure at least the fallbackLng will be used

@@ -2042,24 +2042,24 @@
         this.resolvedLanguage = undefined;
         this.setResolvedLanguage(l);
       };
+      const reboundT = function () {
+        return _this2.translator.translate(...arguments);
+      };
       const done = (err, l) => {
         if (l) {
           setLngProps(l);
           this.translator.changeLanguage(l);
-          console.log('[i18next patch] Rebinding t after language change');
-          this.t = this.translator.translate.bind(this.translator);
-          this.isLanguageChangingTo = undefined;
+          console.log('[i18next patch] Rebinding t after language change', {
+            translatorLanguage: this.translator.language,
+            callBack: callback?.toString() ?? 'no callback'
+          });
+          this.t = reboundT;
           this.emit('languageChanged', l);
           this.logger.log('languageChanged', l);
-        } else {
-          this.isLanguageChangingTo = undefined;
         }
-        deferred.resolve(function () {
-          return _this2.t(...arguments);
-        });
-        if (callback) callback(err, function () {
-          return _this2.t(...arguments);
-        });
+        this.isLanguageChangingTo = undefined;
+        deferred.resolve(reboundT);
+        if (callback) callback(err, reboundT);
       };
       const setLng = lngs => {
         if (!lng && !lngs && this.services.languageDetector) lngs = [];
